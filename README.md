@@ -8,7 +8,7 @@
 ## Results
 
 
-![part 1](/results/pt1.gif)
+![part 1](/result/pt1.gif)
 
 
-![part 2](/results/pt2.gif)
+![part 2](/result/pt2.gif)
