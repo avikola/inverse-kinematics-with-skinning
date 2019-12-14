@@ -7,3 +7,8 @@
 
 ## Results
 
+
+![part 1](/results/pt1.gif)
+
+
+![part 2](/results/pt2.gif)
