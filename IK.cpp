@@ -15,37 +15,38 @@ using namespace std;
 // CSCI 520 Computer Animation and Simulation
 // Spring 2019
 // Jernej Barbic and Yijing Li
+// Avishkar Kolahalu
 
 namespace
 {
 
-// Converts degrees to radians.
-template<typename real>
-inline real deg2rad(real deg) { return deg * M_PI / 180.0; }
+	// Converts degrees to radians.
+	template<typename real>
+	inline real deg2rad(real deg) { return deg * M_PI / 180.0; }
 
-template<typename real>
-Mat3<real> Euler2Rotation(const real angle[3], RotateOrder order)
-{
-  Mat3<real> RX = Mat3<real>::getElementRotationMatrix(0, deg2rad(angle[0]));
-  Mat3<real> RY = Mat3<real>::getElementRotationMatrix(1, deg2rad(angle[1]));
-  Mat3<real> RZ = Mat3<real>::getElementRotationMatrix(2, deg2rad(angle[2]));
+	template<typename real>
+	Mat3<real> Euler2Rotation(const real angle[3], RotateOrder order)
+	{
+		Mat3<real> RX = Mat3<real>::getElementRotationMatrix(0, deg2rad(angle[0]));
+		Mat3<real> RY = Mat3<real>::getElementRotationMatrix(1, deg2rad(angle[1]));
+		Mat3<real> RZ = Mat3<real>::getElementRotationMatrix(2, deg2rad(angle[2]));
 
-  switch(order)
-  {
-    case RotateOrder::XYZ:
-      return RZ * RY * RX;
-    case RotateOrder::YZX:
-      return RX * RZ * RY;
-    case RotateOrder::ZXY:
-      return RY * RX * RZ;
-    case RotateOrder::XZY:
-      return RY * RZ * RX;
-    case RotateOrder::YXZ:
-      return RZ * RX * RY;
-    case RotateOrder::ZYX:
-      return RX * RY * RZ;
-  }
-  assert(0);
+		switch(order)
+		{
+			case RotateOrder::XYZ:
+				return RZ * RY * RX;
+			case RotateOrder::YZX:
+				return RX * RZ * RY;
+			case RotateOrder::ZXY:
+				return RY * RX * RZ;
+			case RotateOrder::XZY:
+				return RY * RZ * RX;
+			case RotateOrder::YXZ:
+				return RZ * RX * RY;
+			case RotateOrder::ZYX:
+				return RX * RY * RZ;
+		}
+		assert(0);
 }
 
 // Performs forward kinematics, using the provided "fk" class.
@@ -59,16 +60,6 @@ void forwardKinematicsFunction(
     int numIKJoints, const int * IKJointIDs, const FK & fk,
     const std::vector<real> & eulerAngles, std::vector<real> & handlePositions)
 {
-  // Students should implement this.
-  // The implementation of this function is very similar to function computeLocalAndGlobalTransforms in the FK class.
-  // The recommended approach is to first implement FK::computeLocalAndGlobalTransforms.
-  // Then, implement the same algorithm into this function. To do so,
-  // you can use fk.getJointUpdateOrder(), fk.getJointRestTranslation(), and fk.getJointRotateOrder() functions.
-  // Also useful is the multiplyAffineTransform4ds function in minivectorTemplate.h .
-  // It would be in principle possible to unify this "forwardKinematicsFunction" and FK::computeLocalAndGlobalTransforms(),
-  // so that code is only written once. We considered this; but it is actually not easily doable.
-  // If you find a good approach, feel free to document it in the README file, for extra credit.
-
 	real euler[3], orient[3];
 
 	// transformations:
@@ -79,7 +70,7 @@ void forwardKinematicsFunction(
 
 	// Similar to that in FK.cpp:
 
-	for (int i = 0; i < fk.getNumJoints(); i++)
+	for (int i = 0; i < fk.getNumJoints(); ++i)
 	{
 		// Rotations:
 
@@ -123,7 +114,7 @@ void forwardKinematicsFunction(
 	}
 
 	// output handle positions.
-	for (int i = 0; i < numIKJoints; i++)
+	for (int i = 0; i < numIKJoints; ++i)
 	{
 		// x, y, z
 		handlePositions[i * 3] = globalTranslate[IKJointIDs[i]][0];
@@ -137,28 +128,19 @@ void forwardKinematicsFunction(
 
 IK::IK(int numIKJoints, const int * IKJointIDs, FK * inputFK, int adolc_tagID)
 {
-  this->numIKJoints = numIKJoints;
-  this->IKJointIDs = IKJointIDs;
-  this->fk = inputFK;
-  this->adolc_tagID = adolc_tagID;
+	this->numIKJoints = numIKJoints;
+	this->IKJointIDs = IKJointIDs;
+	this->fk = inputFK;
+	this->adolc_tagID = adolc_tagID;
 
-  FKInputDim = fk->getNumJoints() * 3;
-  FKOutputDim = numIKJoints * 3;
+	FKInputDim = fk->getNumJoints() * 3;
+	FKOutputDim = numIKJoints * 3;
 
-  train_adolc();
+	train_adolc();
 }
 
 void IK::train_adolc()
 {
-  // Students should implement this.
-  // fkinputdim, i<fkoutputdim for m n
-  // Here, you should setup adol_c:
-  //   Define adol_c inputs and outputs. 
-  //   Use the "forwardKinematicsFunction" as the function that will be computed by adol_c.
-  //   This will later make it possible for you to compute the gradient of this function in IK::doIK
-  //   (in other words, compute the "Jacobian matrix" J).
-  // See ADOLCExample.cpp .
-
 	// dimensions:
 	int n = FKInputDim, m = FKOutputDim;
 
@@ -167,7 +149,7 @@ void IK::train_adolc()
 	// input angles:
 
 	vector<adouble> eu_angles(n);
-	for (int i = 0; i < fk->getNumJoints(); i++)
+	for (int i = 0; i < fk->getNumJoints(); ++i)
 	{
 		eu_angles[i * 3] <<= 0.0;
 		eu_angles[i * 3 + 1] <<= 0.0;
@@ -183,27 +165,15 @@ void IK::train_adolc()
 
 	vector<double> output(m);
 
-	for (int i = 0; i < m; i++)
-	{
+	for (int i = 0; i < m; ++i)
 		handle_pos[i] >>= output[i];
-	}
 
 	trace_off();
 }
 
 void IK::doIK(const Vec3d * targetHandlePositions, Vec3d * jointEulerAngles)
 {
-	// You may find the following helpful:
-	int numJoints = fk->getNumJoints(); // Note that is NOT the same as numIKJoints!
-
-	// Students should implement this.
-	// Use adolc to evalute the forwardKinematicsFunction and its gradient (Jacobian). It was trained in train_adolc().
-	// Specifically, use ::function, and ::jacobian .
-	// See ADOLCExample.cpp .
-	//
-	// Use it implement the Tikhonov IK method (or the pseudoinverse method for extra credit).
-	// Note that at entry, "jointEulerAngles" contains the input Euler angles. 
-	// Upon exit, jointEulerAngles should contain the new Euler angles.
+	int numJoints = fk->getNumJoints();
 
 	vector<double> handle_pos(FKOutputDim);	// handle position
 
@@ -214,9 +184,7 @@ void IK::doIK(const Vec3d * targetHandlePositions, Vec3d * jointEulerAngles)
 	vector<double *> jacobMatrixEachRow(FKOutputDim);
 
 	for (int i = 0; i < FKOutputDim; i++)
-	{
 		jacobMatrixEachRow[i] = &jacobMatrix[i*FKInputDim];
-	}
 
 	::jacobian(adolc_tagID, FKOutputDim, FKInputDim, jointEulerAngles->data(), jacobMatrixEachRow.data());
 
@@ -227,12 +195,8 @@ void IK::doIK(const Vec3d * targetHandlePositions, Vec3d * jointEulerAngles)
 	Eigen::MatrixXd Eigen_J(FKOutputDim, FKInputDim), Eigen_J_Transpose, ID_Matrix;
 
 	for (int i = 0; i < FKOutputDim; i++)
-	{
 		for (int j = 0; j < FKInputDim; j++)
-		{
 			Eigen_J(i, j) = jacobMatrix[i * FKInputDim + j];
-		}
-	}
 
 	Eigen_J_Transpose = Eigen_J.transpose();
 

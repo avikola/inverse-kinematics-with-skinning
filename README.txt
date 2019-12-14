@@ -1,6 +1,8 @@
 	  
      Assignment 3 - Inverse Kinematics with Skinning.
-		 
+		  
+		   Used Late Days.
+
 ===============================================
 	Avishkar Kolahalu - 6138-4283-68
 ===============================================

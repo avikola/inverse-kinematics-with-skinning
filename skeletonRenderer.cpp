@@ -9,38 +9,38 @@ using namespace std;
 
 SkeletonRenderer::SkeletonRenderer(const FK * fk, double localAxisLength)
 {
-  renderedLocalAxisLength = localAxisLength;
-  this->fk = fk;
+	renderedLocalAxisLength = localAxisLength;
+	this->fk = fk;
 }
 
 void SkeletonRenderer::renderSkeleton() const
 {
-  // save attributes
-  glPushAttrib(GL_LINE_BIT | GL_POINT_BIT | GL_CURRENT_BIT);
+	// save attributes
+	glPushAttrib(GL_LINE_BIT | GL_POINT_BIT | GL_CURRENT_BIT);
 
-  // render joint position
-  glColor3f(1,0,0);
-  glPointSize(20);
-  glBegin(GL_POINTS);
-  for(int jointID = 0; jointID < fk->getNumJoints(); jointID++)
-    Draw(fk->getJointGlobalPosition(jointID));
-  glEnd();
+	// render joint position
+	glColor3f(1,0,0);
+	glPointSize(20);
+	glBegin(GL_POINTS);
+	for(int jointID = 0; jointID < fk->getNumJoints(); jointID++)
+	Draw(fk->getJointGlobalPosition(jointID));
+	glEnd();
 
-  // render the connection between joints
-  glLineWidth(5.0);
-  glColor3f(1,1,0);
-  glBegin(GL_LINES);
-  for(int jointID = 0; jointID < fk->getNumJoints(); jointID++)
-  {
-    int parentID = fk->getJointParent(jointID);
-    if (parentID < 0)
-      continue;
+	// render the connection between joints
+	glLineWidth(5.0);
+	glColor3f(1,1,0);
+	glBegin(GL_LINES);
+	for(int jointID = 0; jointID < fk->getNumJoints(); jointID++)
+	{
+		int parentID = fk->getJointParent(jointID);
+		if (parentID < 0)
+			continue;
 
-    Draw(fk->getJointGlobalPosition(jointID), fk->getJointGlobalPosition(parentID));
-  }
-  glEnd();
+		Draw(fk->getJointGlobalPosition(jointID), fk->getJointGlobalPosition(parentID));
+	}
+	glEnd();
   
-  glPopAttrib();
+	glPopAttrib();
 }
 
 void SkeletonRenderer::renderJointCoordAxes(int jointID) const
@@ -69,37 +69,35 @@ void SkeletonRenderer::renderJointCoordAxes(int jointID) const
 
 void SkeletonRenderer::renderJoint(int jointID) const
 {
-  // save attributes
-  glPushAttrib(GL_LINE_BIT | GL_POINT_BIT | GL_CURRENT_BIT);
+	// save attributes
+	glPushAttrib(GL_LINE_BIT | GL_POINT_BIT | GL_CURRENT_BIT);
 
-  // render joint position
-  Vec3d jointPos = fk->getJointGlobalPosition(jointID);
-  glColor3f(1,0,0);
-  glPointSize(10);
-  glBegin(GL_POINTS);
-  Draw(jointPos);
-  glEnd();
+	// render joint position
+	Vec3d jointPos = fk->getJointGlobalPosition(jointID);
+	glColor3f(1,0,0);
+	glPointSize(10);
+	glBegin(GL_POINTS);
+	Draw(jointPos);
+	glEnd();
 
-  // render descedents joints
-  glLineWidth(5.0);
-  glColor3f(1,0,0);
-  vector<int> descedentIDs = fk->getJointDescendents(jointID);
-  glBegin(GL_LINES);
-  for(int childID : descedentIDs)
-  {
-  	int parentID = fk->getJointParent(childID);
-    Draw(fk->getJointGlobalPosition(parentID));
-    Draw(fk->getJointGlobalPosition(childID));
-  }
-  glEnd();
-  glColor3f(0,0,1);
-  glPointSize(10);
-  glBegin(GL_POINTS);
-  for(int childID : descedentIDs)
-  {
-    Draw(fk->getJointGlobalPosition(childID));
-  }
-  glEnd();
-  glPopAttrib();
+	// render descedents joints
+	glLineWidth(5.0);
+	glColor3f(1,0,0);
+	vector<int> descedentIDs = fk->getJointDescendents(jointID);
+	glBegin(GL_LINES);
+	for(int childID : descedentIDs)
+	{
+		int parentID = fk->getJointParent(childID);
+		Draw(fk->getJointGlobalPosition(parentID));
+		Draw(fk->getJointGlobalPosition(childID));
+	}
+	glEnd();
+	glColor3f(0,0,1);
+	glPointSize(10);
+	glBegin(GL_POINTS);
+	for(int childID : descedentIDs)
+		Draw(fk->getJointGlobalPosition(childID));
+	glEnd();
+	glPopAttrib();
 }
 
